@@ -119,6 +119,14 @@
         "primary": "#dfd9d6",
         "accent": "#98c379"
       }
+    },
+    {
+      "name": "catboi",
+      "colors": {
+        "background": "#2E4573",
+        "primary": "#191919",
+        "accent": "#3298FE"
+      }
     }
   ]
 }
