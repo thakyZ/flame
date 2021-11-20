@@ -24,6 +24,9 @@ const getExternalWeather = async () => {
       cloud: cursor.clouds.all,
       conditionText: cursor.weather[0].main,
       conditionCode: cursor.weather[0].id,
+      humidity: cursor.main.humidity,
+      windK: (cursor.wind.speed * 3.6).toFixed(0),
+      windM: ((cursor.wind.speed * 3.6) * 1.609).toFixed(0),
     });
   } catch (err) {
     throw new Error('External API request failed');
