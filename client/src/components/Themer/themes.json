@@ -123,8 +123,8 @@
     {
       "name": "catboi",
       "colors": {
-        "background": "#2E4573",
-        "primary": "#191919",
+        "background": "#191919",
+        "primary": "#EEEEEE",
         "accent": "#3298FE"
       }
     }
