@@ -12,17 +12,19 @@ const getExternalWeather = async () => {
     );
 
     // Save weather data
-    const cursor = res.data.current;
-    const weatherData = await Weather.create({
-      externalLastUpdate: cursor.last_updated,
-      tempC: cursor.temp_c,
-      tempF: cursor.temp_f,
-      isDay: cursor.is_day,
-      cloud: cursor.cloud,
-      conditionText: cursor.condition.text,
-      conditionCode: cursor.condition.code,
+    const cursor = res.data;
+    const temp_c = cursor.main.temp - 273.15;
+    const temp_f = temp_c * 1.8 + 32;
+    const is_day = cursor.dt > cursor.sys.sunrise && cursor.dt < cursor.sys.sunset ? true : false;
+    return await Weather.create({
+      externalLastUpdate: 0,
+      tempC: temp_c.toFixed(0),
+      tempF: temp_f.toFixed(0),
+      isDay: is_day,
+      cloud: cursor.clouds.all,
+      conditionText: cursor.weather[0].main,
+      conditionCode: cursor.weather[0].id,
     });
-    return weatherData;
   } catch (err) {
     throw new Error('External API request failed');
   }
