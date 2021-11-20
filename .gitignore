@@ -3,3 +3,5 @@ data
 public
 !client/public
 build.sh
+build.ps1
+.debug/
