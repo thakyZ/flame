@@ -1,5 +1,7 @@
 node_modules
+.debug
 .github
 public
 k8s
 skaffold.yaml
+build.ps1
