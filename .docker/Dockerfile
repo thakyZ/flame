@@ -1,7 +1,5 @@
 FROM tarampampam/node:16-alpine as builder
 
-WORKDIR /temp
-
 WORKDIR /app
 
 COPY package*.json ./
