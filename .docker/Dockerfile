@@ -16,7 +16,7 @@ RUN npm install --production
 COPY . .
 
 RUN mkdir -p ./public ./data \
-    && npm install ./node-sqlite3 \
+#    && npm install ./node-sqlite3 \
     && cd ./client \
     && npm install --production \
     && npm run build \
