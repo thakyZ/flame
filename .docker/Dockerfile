@@ -1,4 +1,5 @@
-FROM tarampampam/node:16-alpine as builder
+FROM node:16 as builder
+#FROM tarampampam/node:16-alpine as builder
 
 WORKDIR /app
 
@@ -6,11 +7,11 @@ COPY package*.json ./
 
 RUN npm install --production
 
-RUN git clone https://github.com/mapbox/node-sqlite3.git \
-    && cd ./node-sqlite3 \
-    && npm install \
-    && npm install mocha@9.1.3 \
-    && cd ..
+#RUN git clone https://github.com/mapbox/node-sqlite3.git \
+#    && cd ./node-sqlite3 \
+#    && npm install \
+#    && npm install mocha@9.1.3 \
+#    && cd ..
 
 COPY . .
 
