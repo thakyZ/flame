@@ -111,9 +111,9 @@ export const WeatherSettings = (): JSX.Element => {
         />
         <span>
           Using
-          <a href="https://www.weatherapi.com/pricing.aspx" target="blank">
+          <a href="https://openweathermap.org/api" target="blank">
             {' '}
-            Weather API
+            Open Weather Map API
           </a>
           . Key is required for weather module to work.
         </span>
