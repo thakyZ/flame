@@ -4,3 +4,5 @@ public
 !client/public
 build.sh
 .debug/
+secrets/
+docker-compose.yml
