@@ -24,12 +24,12 @@ import { ProtectedRoute } from '../Routing/ProtectedRoute';
 import { Container, Headline } from '../UI';
 
 // Data
-import { routes } from './settings.json';
+import settings from './settings.json';
 
 export const Settings = (): JSX.Element => {
   const { isAuthenticated } = useSelector((state: State) => state.auth);
 
-  const tabs = isAuthenticated ? routes : routes.filter((r) => !r.authRequired);
+  const tabs = isAuthenticated ? settings.routes : settings.routes.filter((r) => !r.authRequired);
 
   return (
     <Container>
@@ -50,7 +50,7 @@ export const Settings = (): JSX.Element => {
           ))}
         </nav>
 
-        {/* ROUTES */}
+        {/* settings.routes */}
         <section className={classes.SettingsContent}>
           <Switch>
             <Route exact path="/settings" component={Themer} />

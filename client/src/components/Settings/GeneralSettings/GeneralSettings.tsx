@@ -15,7 +15,7 @@ import { Button, SettingsHeadline, InputGroup } from '../../UI';
 import { inputHandler, generalSettingsTemplate } from '../../../utility';
 
 // Data
-import { queries } from '../../../utility/searchQueries.json';
+import squeries from '../../../utility/searchQueries.json';
 
 // Redux
 import { State } from '../../../store/reducers';
@@ -174,8 +174,8 @@ export const GeneralSettings = (): JSX.Element => {
             value={formData.defaultSearchProvider}
             onChange={(e) => inputChangeHandler(e)}
           >
-            {[...queries, ...customQueries].map((query: Query, idx) => {
-              const isCustom = idx >= queries.length;
+            {[...squeries.queries, ...customQueries].map((query: Query, idx) => {
+              const isCustom = idx >= squeries.queries.length;
 
               return (
                 <option key={idx} value={query.prefix}>
@@ -197,8 +197,8 @@ export const GeneralSettings = (): JSX.Element => {
               value={formData.secondarySearchProvider}
               onChange={(e) => inputChangeHandler(e)}
             >
-              {[...queries, ...customQueries].map((query: Query, idx) => {
-                const isCustom = idx >= queries.length;
+              {[...squeries.queries, ...customQueries].map((query: Query, idx) => {
+                const isCustom = idx >= squeries.queries.length;
 
                 return (
                   <option key={idx} value={query.prefix}>
