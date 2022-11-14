@@ -2,21 +2,37 @@ version: '3.6'
 
 services:
   flame:
-    image: pawelmalak/flame
-    container_name: flame
+    image: thakyz/flame:latest
+    container_name: Flame
+    build:
+      context: .
+      labels:
+        - "flame.type=application" # "app" works too
+        - "flame.name=Neko Gaming Start"
+        - "flame.url=https://flame.nekogaming.xyz;http://localhost"
+        - "flame.icon=custom,custom" # optional, default is "docker"
     volumes:
-      - /path/to/host/data:/app/data
-      # - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
+      - type: volume
+        source: flame
+        target: /app/data
+      - type: bind # optional but required for Docker integration
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
     ports:
-      - 5005:5005
-    # secrets:
-    #   - password # optional but required for (1)
-    environment:
-      - PASSWORD=flame_password
-      # - PASSWORD_FILE=/run/secrets/password # optional but required for (1)
+      - 80:5005
+    ##secrets:
+    ##  - password # optional but required for (1)
+    ##environment:
+    ##  - PASSWORD=flame_password
+    ##  - PASSWORD_FILE=/run/secrets/password # optional but required for (1)
     restart: unless-stopped
-    
+
 # optional but required for Docker secrets (1)
-# secrets:
-#   password:
-#     file: /path/to/secrets/password
+secrets:
+  password:
+    file: ./secrets/flame_password
+
+volumes:
+  flame:
+    driver: local
+    name: Flame

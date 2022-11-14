@@ -24,11 +24,11 @@ function ReadCompseFile() {
     Exit 1;
   }
 
-  if (-not (Test-Path -Path "$($PSScriptRoot)\docker-compose.yml")) {
+  if (-not (Test-Path -Path "$($PSScriptRoot)\.docker\docker-compose.yml")) {
     Write-Error -Message "Docker Compose file not found";
     return $null;
   }
-  $YamlObject = (ConvertFrom-Yaml -Path "$($PSScriptRoot)\docker-compose.yml" -ErrorAction Stop);
+  $YamlObject = (ConvertFrom-Yaml -Path "$($PSScriptRoot)\.docker\docker-compose.yml" -ErrorAction Stop);
   return $YamlObject;
   Remove-Module FXPSYaml -ErrorAction Stop
 }
@@ -81,7 +81,9 @@ function ComposeBuild() {
   $ComposeFile = (ReadCompseFile);
   $DockerContainer = $ComposeFile.services.flame.container_name;
   if (-not $NoBuild) {
-    &$Docker compose build --no-cache --progress=plain
+    &$Docker rmi $ComposeFile.services.flame.image
+    &$Docker build --no-cache --progress=plain -t $ComposeFile.services.flame.image -f .\.docker\Dockerfile .
+    # &$Docker compose build --no-cache --progress=plain
   }
   if (-not (Test-Path -Path "$($env:AppData)\run")) {
     New-Item -Path "$($env:AppData)\run" -ItemType Directory;
@@ -89,7 +91,7 @@ function ComposeBuild() {
   if (Test-Path -Path "$($env:AppData)\run\flame.cid") {
     Remove-Item "$($env:AppData)\run\flame.cid";
   }
-  &$Docker compose run --detach
+  &$Docker compose up --detach
   &$Docker update --restart unless-stopped $DockerContainer
   (((docker container ls --no-trunc) | Select-String ($ComposeFile.services.flame.image -replace ":.*$", "")) -split " ")[0] | Out-File "$($env:AppData)\run\flame.cid"
 }

@@ -4,13 +4,13 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --omit=dev
+RUN npm install --production
 
 COPY . .
 
 RUN mkdir -p ./public ./data \
     && cd ./client \
-    && npm install --omit=dev \
+    && npm install --production \
     && npm run build \
     && cd .. \
     && mv ./client/build/* ./public \

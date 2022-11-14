@@ -4,12 +4,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --production
+RUN npm install --omit=dev
 
-RUN git clone https://github.com/mapbox/node-sqlite3.git \
+RUN git clone https://github.com/TryGhost/node-sqlite3.git \
     && cd ./node-sqlite3 \
-    && npm install \
-    && npm install mocha@9.1.3 \
+    && npm install --omit=dev \
     && cd ..
 
 COPY . .
@@ -17,11 +16,12 @@ COPY . .
 RUN mkdir -p ./public ./data \
     && npm install ./node-sqlite3 \
     && cd ./client \
-    && npm install --production \
+    && npm install --omit=dev \
     && npm run build \
     && cd .. \
     && mv ./client/build/* ./public \
-    && rm -rf ./client
+    && rm -rf ./client \
+    && npm rebuild
 
 FROM node:16-alpine
 
@@ -32,6 +32,6 @@ WORKDIR /app
 EXPOSE 5005
 
 ENV NODE_ENV=production
-ENV PASSWORD=flame_password
+#ENV PASSWORD=flame_password
 
 CMD ["sh", "-c", "chown -R node /app/data && node server.js"]
