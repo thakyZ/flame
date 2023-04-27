@@ -12,7 +12,8 @@
     "dev-server": "nodemon server.js -e js",
     "dev-client": "npm start --prefix client",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
-    "skaffold": "concurrently \"npm run init-client\" \"npm run dev-server\""
+    "skaffold": "concurrently \"npm run init-client\" \"npm run dev-server\"",
+    "clean": "node clean.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,15 +25,24 @@
     "docker-secret": "^1.2.4",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "multer": "^1.4.3",
     "node-schedule": "^2.0.0",
     "sequelize": "^6.9.0",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "link:node-sqlite3",
     "umzug": "^2.3.0",
     "ws": "^8.2.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"
+  },
+  "pnpm": {
+    "overrides": {
+      "got@<11.8.5": ">=11.8.5",
+      "qs@>=6.7.0 <6.7.3": ">=6.7.3",
+      "sequelize@<6.19.1": ">=6.19.1",
+      "sequelize@<6.28.1": ">=6.28.1",
+      "sequelize@<6.29.0": ">=6.29.0"
+    }
   }
 }

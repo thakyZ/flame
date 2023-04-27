@@ -1,0 +1,3 @@
+[submodule "node-sqlite3"]
+	path = node-sqlite3
+	url = https://github.com/TryGhost/node-sqlite3.git
