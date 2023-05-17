@@ -2,21 +2,25 @@ FROM node:16 as builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY pnpm*.yaml ./
+COPY package.json ./
 
-RUN git submodule update --init --recursive \
-    && cd ./node-sqlite3 \
-    && npm install --omit=dev \
-    && npm audit --fix \
-    && cd .. \
-    && npm install -g pnpm \
+RUN npm install -g pnpm \
     && pnpm install --production
+
+COPY node-sqlite3 ./node-sqlite3
+
+RUN cd ./node-sqlite3 \
+    && npm install --omit=dev \
+    && npm audit fix --force \
+    && cd ..
 
 COPY . .
 
 RUN mkdir -p ./public ./data \
-    && cd ./client \
     && npm install -g pnpm \
+    && pnpm install ./node-sqlite3 \
+    && cd ./client \
     && pnpm install --production \
     && pnpm run build \
     && cd .. \

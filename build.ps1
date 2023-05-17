@@ -9,31 +9,31 @@ param(
   $NoBuild
 )
 
-$Docker = (Get-Command "docker.exe");
-if (-not (Test-Path -Path $Docker.Source -PathType Leaf)) {
+$Docker = (Get-Command -Name "docker");
+if (-not (Test-Path -LiteralPath $Docker.Source -PathType Leaf)) {
   Write-Error -Message "Docker executable not found.";
   Exit 1;
 }
 
-function ReadCompseFile() {
+function Read-CompseFile() {
   try {
-    Import-Module FXPSYaml -ErrorAction Stop
+    Import-Module -Name "powershell-yaml" -ErrorAction Stop
   }
   catch {
     Write-Error -Message "Module PSYaml is not installed."
     Exit 1;
   }
 
-  if (-not (Test-Path -Path "$($PSScriptRoot)\.docker\docker-compose.yml")) {
+  if (-not (Test-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath ".docker" -AdditionalChildPath "docker-compose.yml"))) {
     Write-Error -Message "Docker Compose file not found";
     return $null;
   }
-  $YamlObject = (ConvertFrom-Yaml -Path "$($PSScriptRoot)\.docker\docker-compose.yml" -ErrorAction Stop);
+  $YamlObject = (Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath ".docker" -AdditionalChildPath "docker-compose.yml") -ErrorAction Stop | ConvertFrom-Yaml);
   return $YamlObject;
-  Remove-Module FXPSYaml -ErrorAction Stop
+  Remove-Module -Name "powershell-yaml" -ErrorAction Stop
 }
 
-function AskForInput() {
+function Read-Input() {
   param(
     # The question to be asked
     [Parameter(Position = 0, Mandatory = $True, HelpMessage = "The question to be asked")]
@@ -51,7 +51,7 @@ function AskForInput() {
   return $Answer;
 }
 
-function CheckPassword() {
+function Test-Password() {
   param (
     # Compose File Object
     [Parameter(Position = 0, Mandatory = $True, HelpMessage = "Compose File Object")]
@@ -72,49 +72,68 @@ function CheckPassword() {
     return (Get-Content -Path $Object.secrets.password.file);
   }
   else {
-    $FlamePassword = (AskForInput -Question "Flame Password?" -Default (((Test-Path "$($PSScriptRoot)\secrets\flame_password") && (Get-Content "$($PSScriptRoot)\secrets\flame_password")) || "password"));
+    $FlamePassword = (Read-Input -Question "Flame Password?" -Default (((Test-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "secrets" -AdditionalChildPath "flame_password")) && (Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "secrets" -AdditionalChildPath "flame_password"))) || "password"));
     return $FlamePassword;
   }
 }
 
-function ComposeBuild() {
-  $ComposeFile = (ReadCompseFile);
-  $DockerContainer = $ComposeFile.services.flame.container_name;
-  if (-not $NoBuild) {
-    &$Docker rmi $ComposeFile.services.flame.image
-    &$Docker build --no-cache --progress=plain -t $ComposeFile.services.flame.image -f .\.docker\Dockerfile .
-    # &$Docker compose build --no-cache --progress=plain
+Function Get-DockerFile() {
+  param(
+    # File Name
+    [Parameter(Mandatory = $True)]
+    [string]
+    $Value
+  )
+
+  $DockerFolder = (Join-Path -Path $PSScriptRoot -ChildPath ".docker");
+  If (Test-Path -LiteralPath (Join-Path -Path $DockerFolder -ChildPath $Value) -PathType Leaf) {
+    $Path = (Join-Path -Path $DockerFolder -ChildPath $Value);
+    $Relavtive = (Resolve-Path -LiteralPath $Path -Relative);
+    return $Relavtive;
   }
-  if (-not (Test-Path -Path "$($env:AppData)\run")) {
-    New-Item -Path "$($env:AppData)\run" -ItemType Directory;
-  }
-  if (Test-Path -Path "$($env:AppData)\run\flame.cid") {
-    Remove-Item "$($env:AppData)\run\flame.cid";
-  }
-  &$Docker compose up --detach
-  &$Docker update --restart unless-stopped $DockerContainer
-  (((docker container ls --no-trunc) | Select-String ($ComposeFile.services.flame.image -replace ":.*$", "")) -split " ")[0] | Out-File "$($env:AppData)\run\flame.cid"
 }
 
-function NormalBuild() {
-  $DockerContainer = (AskForInput -Question "Docker Container Name?" -Default "Flame");
+function Invoke-ComposeBuild() {
+  $ComposeFile = (Read-CompseFile);
+  $DockerContainer = $ComposeFile.services.flame.container_name;
+
+  if (-not $NoBuild) {
+    if ($null -ne (&$Docker images list | Select-String "$($ComposeFile.services.flame.image)")) {
+      &$Docker rmi $ComposeFile.services.flame.image
+    }
+    &$Docker build --no-cache --progress=plain -t $ComposeFile.services.flame.image -f "$(Get-DockerFile -Value "Dockerfile")" .
+    # &$Docker compose build --no-cache --progress=plain
+  }
+  if (-not (Test-Path -LiteralPath (Join-Path -Path $env:AppData -ChildPath "run"))) {
+    New-Item -LiteralPath (Join-Path -Path $env:AppData -ChildPath "run") -ItemType Directory;
+  }
+  if (Test-Path -LiteralPath (Join-Path -Path $env:AppData -ChildPath "run" -AdditionalChildPath "flame.cid")) {
+    Remove-Item -LiteralPath (Join-Path -Path $env:AppData -ChildPath "run" -AdditionalChildPath "flame.cid");
+  }
+  &$Docker compose up --detach "$(Get-DockerFile -Value "docker-compose.yml")"
+  &$Docker update --restart unless-stopped $DockerContainer
+  (((docker container ls --no-trunc) | Select-String ($ComposeFile.services.flame.image -replace ":.*$", "")) -split " ")[0] | Out-File (Join-Path -Path $env:AppData -ChildPath "run" -AdditionalChildPath "flame.cid")
+}
+
+function Invoke-NormalBuild() {
+  $DockerContainer = (Read-Input -Question "Docker Container Name?" -Default "Flame");
   &$Docker container stop $DockerContainer
   &$Docker rm $DockerContainer
-  $DockerImage = (AskForInput -Question "Docker Image Name?" -Default "Flame");
+  $DockerImage = (Read-Input -Question "Docker Image Name?" -Default "Flame");
   if (-not $NoBuild) {
     &$Docker rmi $DockerImage
-    &$Docker build --no-cache --progress=plain -t $DockerImage -f .\.docker\Dockerfile .
+    &$Docker build --no-cache --progress=plain -t $DockerImage -f "$(Get-DockerFile -Value "Dockerfile")" .
   }
-  Remove-Item "$($env:AppData)\run\flame.cid"
-  $FlamePassword = (AskForInput -Question "Flame Password?" -Default (((Test-Path "$($PSScriptRoot)\secrets\flame_password") && (Get-Content "$($PSScriptRoot)\secrets\flame_password")) || "password"));
+  Remove-Item -LiteralPath (Join-Path -Path $env:AppData -ChildPath "run" -AdditionalChildPath "flame.cid")
+  $FlamePassword = (Read-Input -Question "Flame Password?" -Default (((Test-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "secrets" -AdditionalChildPath "flame_password")) && (Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath "secrets" -AdditionalChildPath "flame_password"))) || "password"));
   &$Docker create --name $DockerContainer --cidfile "$($env:AppData)\run\flame.cid" --mount type=volume, src=Flame, target=/app/data -p 80:5005 -e PASSWORD $FlamePassword ($DockerImage -replace ":.*$", "")
   &$Docker container start $DockerContainer
   &$Docker update --restart unless-stopped $DockerContainer
 }
 
 if ($Compose) {
-  ComposeBuild;
+  Invoke-ComposeBuild;
 }
 else {
-  NormalBuild;
+  Invoke-NormalBuild;
 }
