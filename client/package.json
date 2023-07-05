@@ -31,6 +31,7 @@
     "skycons-ts": "^0.2.0",
     "typescript": "^4.4.4",
     "web-vitals": "^2.1.2"
+    "nth-check": "^2.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -59,9 +60,7 @@
   "devDependencies": {
     "prettier": "^2.4.1"
   },
-  "pnpm": {
-    "overrides": {
-      "nth-check@<2.0.1": ">=2.0.1"
-    }
+  "overrides": {
+    "nth-check": "$nth-check"
   }
 }
