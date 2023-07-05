@@ -30,7 +30,7 @@
     "redux-thunk": "^2.4.0",
     "skycons-ts": "^0.2.0",
     "typescript": "^4.4.4",
-    "web-vitals": "^2.1.2"
+    "web-vitals": "^2.1.2",
     "nth-check": "^2.1.1"
   },
   "scripts": {
