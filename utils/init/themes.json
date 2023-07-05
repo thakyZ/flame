@@ -151,6 +151,15 @@
         "accent": "#50fbc2"
       },
       "isCustom": false
+    },
+    {
+      "name": "cat_boi",
+      "colors": {
+        "background": "#1f1f1f",
+        "primary": "#effbff",
+        "accent": "#4ca6ff"
+      },
+      "isCustom": true
     }
   ]
 }
