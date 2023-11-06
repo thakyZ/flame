@@ -31,7 +31,10 @@
     "node-schedule": "^2.0.0",
     "sequelize": "^6.29.0",
     "sqlite3": "file:node-sqlite3",
-    "ws": "^8.2.3"
+    "umzug": "^2.3.0",
+    "ws": "^8.2.3",
+    "minimatch": "^3.0.5",
+    "semver": "^7.5.2"
   },
   "devDependencies": {
     "debug": "^3.2.7",
@@ -39,37 +42,47 @@
   },
   "overrides": {
     "got": "^12.6.0",
-    "qs": ".11.2",
+    "qs": "^6.11.2",
     "sequelize": "^6.29.0",
     "tar": "^6.1.15",
     "uuid": "^7.0.3",
     "@npmcli/move-file": "$@npmcli/fs",
+    "semver": "$semver",
     "flat": "^5.0.1",
-    "mocha": "^10.2.0",
+    "mocha": {
+      "glob": {
+        "minimatch": "$minimatch"
+      }
+    },
     "nodemon@^2.0.14": {
       "debug": "^3.2.7"
     },
+    "@mapbox/node-pre-gyp@^1.0.0": {
+      "make-dir": {
+        "semver": "$semver"
+      }
+    },
     "node-sqlite3": {
-      "@mapbox/node-pre-gyp": {
+      "@mapbox/node-pre-gyp@^1.0.0": {
         "make-dir": {
-          "semver": "^7.5.2"
+          "semver": "$semver"
         }
       },
       "mocha": {
         "glob": {
-          "minimatch": "^3.0.5"
+          "minimatch": "$minimatch"
         }
       }
     },
     "sqlite3": {
-      "@mapbox/node-pre-gyp": {
+      "@mapbox/node-pre-gyp@^1.0.0": {
         "make-dir": {
-          "semver": "^7.5.2"
+          "semver": "$semver"
         }
       },
       "mocha": {
         "glob": {
-          "minimatch": "^3.0.5"
+          "minimatch": "$minimatch"
         }
       }
     }
