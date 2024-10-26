@@ -17,7 +17,7 @@
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.6.0",
     "external-svg-loader": "^1.6.10",
-    "http-proxy-middleware": "^2.0.6",
+    "http-proxy-middleware": "^2.0.7",
     "jwt-decode": "^4.0.0",
     "nth-check": "^2.1.1",
     "react": "^18.2.0",
